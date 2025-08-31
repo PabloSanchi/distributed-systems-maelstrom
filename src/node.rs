@@ -5,11 +5,11 @@ use rand::Rng;
 use std::io::StdoutLock;
 use std::sync::OnceLock;
 
-pub struct EchoNode {
+pub struct Node {
     node_id: OnceLock<String>,
 }
 
-impl EchoNode {
+impl Node {
     pub fn new() -> Self {
         Self {
             node_id: OnceLock::new(),
@@ -80,7 +80,7 @@ impl EchoNode {
     }
 }
 
-impl Default for EchoNode {
+impl Default for Node {
     fn default() -> Self {
         Self::new()
     }

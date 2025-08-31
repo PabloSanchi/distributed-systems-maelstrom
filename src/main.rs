@@ -1,4 +1,4 @@
-use challenge::{EchoNode, Message, NewLineWriter};
+use challenge::{Node, Message, NewLineWriter};
 
 fn main() -> std::io::Result<()> {
     env_logger::init();
@@ -6,7 +6,7 @@ fn main() -> std::io::Result<()> {
     let stdin = std::io::stdin().lock();
     let stdout = std::io::stdout().lock();
     let mut output = NewLineWriter::new(stdout);
-    let mut echo_node = EchoNode::new();
+    let mut echo_node = Node::new();
 
     let input_stream = serde_json::Deserializer::from_reader(stdin).into_iter::<Message>();
     for input in input_stream {

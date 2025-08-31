@@ -1,10 +1,10 @@
-use challenge::{Body, EchoNode, Message, Payload};
+use challenge::{Body, Node, Message, Payload};
 use std::string::String;
 
 #[test]
 fn init_use_case() {
     // given
-    let mut node = EchoNode::new();
+    let mut node = Node::new();
     let init_msg = default_init_msg();
 
     // when
@@ -29,7 +29,7 @@ fn init_use_case() {
 #[test]
 fn echo_use_case() {
     // given
-    let mut node = EchoNode::new();
+    let mut node = Node::new();
     let init_msg = default_init_msg();
 
     node.handle_msg(init_msg)
