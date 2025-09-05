@@ -1,4 +1,8 @@
-use challenge::{Body, Node, Message, Payload};
+use challenge::{
+    Body, Message, Node, Payload,
+    message::{EchoPayload, InitPayload, MessageBuilder},
+    node::MessageGenerator,
+};
 use std::string::String;
 
 #[test]
@@ -9,21 +13,16 @@ fn init_use_case() {
 
     // when
     let reply = node
-        .handle_msg(init_msg)
+        .generate_msg(&init_msg)
         .expect("init_ok reply is expected");
 
     // then
     let Message { src, dest, body } = reply;
-    let Body {
-        in_reply_to,
-        payload,
-        ..
-    } = body;
+    let Body { payload, .. } = body;
 
     assert_eq!(src, "n3");
     assert_eq!(dest, "master");
-    assert_eq!(in_reply_to, Some(1));
-    assert!(matches!(payload, Payload::InitOk {}));
+    assert!(matches!(payload, Payload::InitOk(..)));
 }
 
 #[test]
@@ -32,41 +31,35 @@ fn echo_use_case() {
     let mut node = Node::new();
     let init_msg = default_init_msg();
 
-    node.handle_msg(init_msg)
+    node.generate_msg(&init_msg)
         .expect("init_ok reply is expected");
 
     let echo_content = String::from("this is the echo msg");
-    let echo_msg = Message {
-        src: "master".into(),
-        dest: "n3".into(),
-        body: Body {
-            msg_id: Some(1),
-            in_reply_to: None,
-            payload: Payload::Echo {
-                echo: echo_content.clone(),
-            },
-        },
+    let echo_payload = EchoPayload {
+        echo: echo_content.clone(),
     };
+    let echo_msg = MessageBuilder::new()
+        .with_src("master".into())
+        .with_dest("n3".into())
+        .with_msg_id(1)
+        .with_payload(Payload::Echo(echo_payload))
+        .build();
 
     // when
     let reply = node
-        .handle_msg(echo_msg)
-        .expect("init_ok reply is expected");
+        .generate_msg(&echo_msg)
+        .expect("echo_ok reply is expected");
 
     // then
     let Message { src, dest, body } = reply;
-    let Body {
-        in_reply_to,
-        payload,
-        ..
-    } = body;
+    let Body { payload, .. } = body;
 
     assert_eq!(src, "n3");
     assert_eq!(dest, "master");
-    assert_eq!(in_reply_to, Some(1));
 
     match payload {
-        Payload::EchoOk { echo } => {
+        Payload::EchoOk(echo_payload) => {
+            let EchoPayload { echo } = echo_payload;
             assert_eq!(echo, echo_content);
         }
         other => panic!("expected EchoOk, got {:?}", other),
@@ -74,16 +67,15 @@ fn echo_use_case() {
 }
 
 fn default_init_msg() -> Message {
-    Message {
-        src: "master".into(),
-        dest: "n3".into(),
-        body: Body {
-            msg_id: Some(1),
-            in_reply_to: None,
-            payload: Payload::Init {
-                node_id: "n3".into(),
-                node_ids: vec!["n1".into(), "n2".into()],
-            },
-        },
-    }
+    let init_payload = InitPayload {
+        node_id: "n3".into(),
+        node_ids: vec!["n1".into(), "n2".into()],
+    };
+
+    MessageBuilder::new()
+        .with_src("master".into())
+        .with_dest("n3".into())
+        .with_msg_id(1)
+        .with_payload(Payload::Init(init_payload))
+        .build()
 }
