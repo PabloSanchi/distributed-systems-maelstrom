@@ -1,4 +1,4 @@
-use challenge::{Node, Message, NewLineWriter};
+use challenge::{Message, NewLineWriter, Node};
 
 fn main() -> std::io::Result<()> {
     env_logger::init();
