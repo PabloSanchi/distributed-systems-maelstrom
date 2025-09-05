@@ -125,15 +125,18 @@ pub struct Body {
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct EmptyPayload {}
+
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct InitPayload {
     pub node_id: String,
     pub node_ids: Vec<String>,
 }
+
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct EchoPayload {
     pub echo: String,
 }
+
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct GeneratePayload {
     pub id: String,
